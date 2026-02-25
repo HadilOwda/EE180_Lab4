@@ -8,5 +8,6 @@ cp README $DIR
 cp -R hw/fpga.img $DIR
 cp -R hw/hdl/verilog/sobel $DIR
 cp -R sim/tests $DIR
-tar -czf $DIR.tar.gz $DIR
+(cd $DIR && zip -r ../$DIR.zip .)
 rm -rf $DIR
+echo "Submission file created: $DIR.zip"
