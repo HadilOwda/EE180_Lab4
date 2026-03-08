@@ -75,7 +75,7 @@ generate
             
             // Combine the values above in a way that faithfully implements Sobel.
             // You may declare more signals as needed.
-            convx[c]   = 'h0; 
+            convx[c]   = (convx31[c] + convx32[c] + convx33[c]) - (convx11[c] + convx12[c] + convx13[c]);
             
             // *** Calculation of the vertical Sobel convolution ***
             // Each "convy" value corresponds to an input to that calculation, a different pixel in the 9-by-9 grid.
@@ -89,16 +89,16 @@ generate
             
             // Combine the values above in a way that faithfully implements Sobel.
             // You may declare more signals as needed.
-            convy[c]   = 'h0;
+            convy[c]   = (convy11[c] + convy21[c] + convy31[c]) - (convy13[c] + convy23[c] + convy33[c]);
             
             // *** Calculation of the overall Sobel convolution result ***
             // The horizontal and vertical convolutions must be combined in a way that faithfully implements the Sobel convolution algorithm.
-            sobel_sum[c] = 'h0;
+            sobel_sum[c] = (convx[c][11] ? -convx[c] : convx[c]) + (convy[c][11] ? -convy[c] : convy[c]);
             
             // *** Writing out the Sobel convolution result ***
             // This line should place the output of the Sobel convolution (the lines above) into the correct location in the output byte vector.
             // It currently does that without modifications. You may need to change it or keep it as is, depending on your implementation.
-            sobel_out[(c+1)*8-1:(c)*8] = sobel_sum[c][7:0];
+            sobel_out[(c+1)*8-1:(c)*8] = (sobel_sum[c] > 12'hFF) ? 8'hFF : sobel_sum[c][7:0]; //clamps if overflow
         end
     end
 endgenerate
