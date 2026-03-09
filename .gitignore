@@ -1,2 +1,4 @@
 *.vcd
 *.hex
+*.vcd
+sim/tests/
