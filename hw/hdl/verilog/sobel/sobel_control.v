@@ -212,10 +212,13 @@ always @ (*) begin
             if (go) begin
                 // *** Row 3 loading state ***
                 // Insert your state transition code here.
-                if (row_counter == control_n_rows - 2)
-                    state_next = STATE_PROCESSING_CALC_LAST;
-                else
-                    state_next = STATE_PROCESSING_CALC;
+		//
+		if (go)
+		      state_next = STATE_PROCESSING_CALC;
+                //if (row_counter == control_n_rows - 2) ->this check only needed in LOADSS
+                //    state_next = STATE_PROCESSING_CALC_LAST;
+                //else
+                //    state_next = STATE_PROCESSING_CALC;
             end
         end
         
@@ -504,7 +507,7 @@ always @ (*) begin
             if (go) begin
                 // Once the control signal is asserted, does something need to happen?
                 // Think about what the next state is going to be and what data the accelerator expects to get.
-                buf_read_offset_next            = 'h0;
+                buf_read_offset_next            = control_n_cols + col_strip;
             end else begin
                 // If there is no control signal, just read from the beginning of the image.
                 // This part is provided for you.
@@ -514,12 +517,12 @@ always @ (*) begin
         
         STATE_LOADING_1: begin
             // What happens in this state? Insert your code here. If nothing changes, you can remove this case completely.
-            buf_read_offset_next                = control_n_cols + col_strip;
+            buf_read_offset_next                = (2*control_n_cols) + col_strip;
         end
         
         STATE_LOADING_2: begin
             // What happens in this state? Insert your code here. If nothing changes, you can remove this case completely.
-            buf_read_offset_next                = (2 * control_n_cols) + col_strip;
+            buf_read_offset_next                = (3 * control_n_cols) + col_strip;
         end
         
         STATE_LOADING_3: begin
@@ -529,12 +532,12 @@ always @ (*) begin
         
         STATE_PROCESSING_CALC: begin
             // What happens in this state? Insert your code here. If nothing changes, you can remove this case completely.
-            buf_read_offset_next                = (row_counter + 1) * control_n_cols + col_strip;
+            buf_read_offset_next                = buf_read_offset; //(row_counter + 1) * control_n_cols + col_strip;
         end
         
         STATE_PROCESSING_LOADSS: begin
             // What happens in this state? Insert your code here. If nothing changes, you can remove this case completely.
-            buf_read_offset_next                = buf_read_offset;
+            buf_read_offset_next                = control_n_cols + buf_read_offset; //(4*control_n_cols) + col_strip; //(row_counter + 1) * control_n_cols + col_strip; //buf_read_offset;
         end
         
         STATE_PROCESSING_CALC_LAST: begin
@@ -544,7 +547,7 @@ always @ (*) begin
         
         STATE_PROCESSING_LOADSS_LAST: begin
             // What happens in this state? Insert your code here. If nothing changes, you can remove this case completely.
-            buf_read_offset_next                = next_col_strip;
+            buf_read_offset_next                = next_col_strip + control_n_cols;
         end
         
         STATE_PROCESSING_DONE: begin
